@@ -1,1 +1,6 @@
 .DS_Store
+*.sph
+*.wav
+.vscode/
+*.tar.gz
+sph2pipe*/
