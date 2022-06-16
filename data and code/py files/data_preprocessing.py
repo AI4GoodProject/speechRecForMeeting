@@ -48,13 +48,14 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
   print("Rows timestamps (should match number of obs): ", df_timeshapes.shape[0])
 
   if AWS:
-    data_key = 'whole-dataset.pkl'
-    dataset_path = 's3://ai4good-m6-2022/processed_data/{}'.format(data_key)
-    data_whole = dataset(features, df_timestamps, labels)
-    # Fix
-    with open(dataset_path, 'wb') as f:
-      print("Writing to {}".format(dataset_path))
-      pickle.dump(data_whole, f)
+    data_key = 'dataset-2.pkl'
+    bucket = 'ai4good-m6-2022'
+    data_2 = dataset(features, df_timestamps, labels)
+    
+    pickle_data_32 = pickle.dumps(data_2) 
+    s3_resource = boto3.resource('s3')
+    s3_resource.Object(bucket,key).put(Body=pickle_data_32)
+
   else:
     dataset_path = './processed-data/whole-dataset.pkl'
     with open(dataset_path, 'wb') as f:
