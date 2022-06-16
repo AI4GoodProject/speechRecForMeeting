@@ -62,7 +62,7 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
     pickle.dump(ds, f)
   return dataset_path
 
-def processSignals(signals_folder, rootPath):
+def processSignals(signals_folder):
   '''
   inputs path (str) to 
   '''
@@ -70,17 +70,14 @@ def processSignals(signals_folder, rootPath):
   p['segment_length'] = 10 # must be an int
   p['overlap_length'] = 1 # must be an int
 
-  os.chdir(signals_folder)
   df_timestamps = pd.DataFrame(columns=['meeting_id','st_time','ed_time'])
   segments_path = []
-  for audio_file in glob.glob('*.wav'):
+  for audio_file in glob.glob(signals_folder + '/*.wav'):
     df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
-    segments_paths_t = getInputSegments(audio_file, df_timestamps_t, rootPath)
+    segments_paths_t = getInputSegments(audio_file, df_timestamps_t, dataPath)
     df_timestamps = df_timestamps.append(df_timestamps_t)
     segments_path.append(segments_paths_t)
     print(f"{audio_file} segmented.\n")
-
-  os.chdir(rootPath)
 
   print("Number of segments: {}".format(len(segments_path)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
@@ -147,7 +144,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       #print("segmented")
       count = count + 1
       
-      segment_path = "{}/segments-viv/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      segment_path = "{}/segments-1/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
     # os.makedirs("./segments_viv") (not working, we created the folder manually)

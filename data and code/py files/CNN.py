@@ -17,7 +17,7 @@ from collections import Counter
 from torch.utils.data import DataLoader
 import torch.optim as optim
 
-from sklearn.metrics import roc_auc_score,precision_score,recall_score,accuracy_score
+from sklearn.metrics import roc_auc_score,precision_recall_curve,accuracy_score
 
 class CNN(nn.Module):
     def __init__(self):
