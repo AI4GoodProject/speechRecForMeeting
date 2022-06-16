@@ -70,14 +70,14 @@ def prediction(loader, model, criterion):
     
   return losses/len(list(loader)), 1 - correct/total # we need to normalize loss with respect to the number of batches 
 
-def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5):
+def train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5, use_gpu = False):
   train_losses = []
   test_losses = []
 
   train_error_rates = []
   test_error_rates = []
 
-  use_gpu = True
+  
   if use_gpu:
     # switch model to GPU
     CNN.cuda()

@@ -60,10 +60,6 @@ from CNN import *
 
 ## Data pre-processing ##
 
-
-with contextlib.closing(wave.open('dialogue-acts-prepped.pkl','r')) as f:
-        df_diag_acts = pd.load(f)
-
 [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
 prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
 
@@ -84,7 +80,7 @@ p['momentum'] = 0.9
 optimizer = optim.SGD(CNN.parameters(), lr=p['lr'], momentum=p['momentum'])
 with mlflow.start_run(run_name="CNN on 10 meetings"):
     use_gpu = torch.cuda.is_available()
-    m = train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5)
+    m = train(CNN, train_dataloader, val_dataloader, optimizer, criterion, num_epochs=5, use_gpu=False)
     
     # Log parameters + metrics
     mlflow.log_params(p)
