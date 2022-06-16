@@ -41,14 +41,13 @@ class CNN(nn.Module):
         x = self.fc3(x)
         return x
 
-def prediction(loader, model, criterion):
+def prediction(loader, model, criterion, use_gpu=False):
 
   correct = 0
   total = 0
   losses = 0
 
   for i, (images, labels) in enumerate(loader):
-    use_gpu = True
     if use_gpu:
       # switch tensor type to GPU
       images = images.cuda()
@@ -56,8 +55,9 @@ def prediction(loader, model, criterion):
        
     #print(image.shape, 'test')
     outputs = model(images)
+    print('outputs: ', predictions.size())
     predictions = outputs[:,1].clone()
-    #print('output size: ', predictions.size())
+    print('output size: ', predictions.size())
     
     loss = criterion(outputs, labels)
 

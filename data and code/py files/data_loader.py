@@ -32,6 +32,7 @@ def prepareData(pickle_file):
         data = pickle.load(f)
 
     p = data.p
+    p['n'] = len(data)
     p['train split'] = 0.7
     test_val_split = 0.5
     p['test split'] = (1 - p['train split'])*test_val_split
@@ -62,8 +63,8 @@ def prepareData(pickle_file):
     count=Counter(Y_train)
     class_count=np.array([count[0],count[1]])
     print("Percent Interruption - ", count[1]/(count[0]+count[1]))
-     p['itrpns in train'] = count_val[1]/(count_val[0]+count_val[1])
-    p['# itrpns in train'] = count_val[0]+count_val[1]
+    p['itrpns in train'] = count[1]/(count[0]+count[1])
+    p['train size '] = count[0]+count[1]
     weight=1./class_count
     print("Weight:", weight)
     samples_weight = np.array([weight[t] for t in Y_train])
@@ -77,7 +78,7 @@ def prepareData(pickle_file):
     class_count_val=np.array([count_val[0],count_val[1]])
     print("Percent Interruption - ", count_val[1]/(count_val[0]+count_val[1]))
     p['itrpns in val'] = count_val[1]/(count_val[0]+count_val[1])
-    p['# itrpns in val'] = count_val[0]+count_val[1]
+    p['val size'] = count_val[0]+count_val[1]
     weight_val=1./class_count_val
     print("Weight:", weight_val)
 
@@ -86,14 +87,13 @@ def prepareData(pickle_file):
 
     sampler_val = WeightedRandomSampler(samples_weight_val, len(samples_weight_val)) #replacement=False
     print("Validation sampler loaded.\n")
-
+    print("Parameters: " p)
     ## Load Data ##
     p['batch size'] = 64
     train_dataloader = DataLoader(train_data, batch_size=p['batch size'], sampler = sampler)
     val_dataloader = DataLoader(val_data, batch_size=p['batch size'], sampler = sampler_val)
     test_dataloader = DataLoader(test_data, batch_size=p['batch size'], shuffle=True)
 
-    
     print("Train/val/test data loading complete\n")
     return train_dataloader, val_dataloader, test_dataloader, p
 
