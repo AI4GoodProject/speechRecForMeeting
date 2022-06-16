@@ -30,6 +30,12 @@ if google:
     drive.mount('/content/drive')
     os.chdir("/content/drive/My Drive/Team 6")
     rootPath = "/content/drive/My Drive/Team 6"
+elif AWS:
+    import boto3
+    import pandas as pd
+    from sagemaker import get_execution_role
+    role = get_execution_role()
+    bucket='ai4goodlab-m6-2022'
 else:
     rootPath = './data and code'
 
@@ -46,6 +52,14 @@ from data_loader import *
 from CNN import *
 
 ## Data pre-processing ##
+
+diag_acts_key = 'dialogue-acts-prepped.pkl'
+diag_acts_path = 's3://ai4good-m6-2022/oricessed-data/{}'.format(data_key)
+with open(diag_acts_path, 'rb') as f:
+    print("Reading {}".format(diag_acts_path))
+    df_diag_acts = pickle.load(f)
+
+seg_keys = ['Bro015.interaction.wav', 'BMr030.interaction.wav']
 
 # [segment_full_paths, df_timestamps] = processSignals("Signals-10M", rootPath)
 # prepareDataset(segment_full_paths, df_timestamps, frac_interp, p)
