@@ -39,7 +39,7 @@ if google:
 
 else:
     rootPath = './speechRecForMeeting'
-    dataPath = './processed-data'
+    dataPath = '.'
 
 # -----------------------------------------------------------
 
@@ -60,10 +60,10 @@ from CNN import *
 
 ## Data pre-processing ##
 
-with open(dataPath + '/dialogue-acts-prepped.pkl','rb') as f:
+with open(dataPath + '/processed-data/dialogue-acts-prepped.pkl','rb') as f:
     df_diag_acts = pickle.load(f)
 
-segment_full_paths, df_timestamps, p = processSignals(dataPath + "/Signals-1")
+segment_paths, df_timestamps, p = processSignals("/processed-data/Signals-1", dataPath)
 prepareDataset(segment_paths, df_diag_acts, df_timestamps, p)
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -82,7 +82,7 @@ CNN = initialize()
 criterion = nn.CrossEntropyLoss()
 p['lr'] = 0.01
 p['momentum'] = 0.9
-p['weight_decay'] = 
+p['weight_decay'] = 0.0
 optimizer = optim.SGD(CNN.parameters(), lr=p['lr'], momentum=p['momentum'])
 
 with mlflow.start_run(run_name="Testing new metrics", experiment_id=exp_id_10M):

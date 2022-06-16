@@ -62,7 +62,7 @@ def prepareDataset(segment_paths, df_diag_acts, df_timestamps, p):
     pickle.dump(ds, f)
   return dataset_path
 
-def processSignals(signals_folder):
+def processSignals(signals_folder, dataPath):
   '''
   inputs path (str) to 
   '''
@@ -72,16 +72,18 @@ def processSignals(signals_folder):
 
   df_timestamps = pd.DataFrame(columns=['meeting_id','st_time','ed_time'])
   segments_path = []
+  os.chdir(signals_folder)
+  print("Signals found: ",glob.glob(signals_folder + '/*.wav'))
   for audio_file in glob.glob(signals_folder + '/*.wav'):
     df_timestamps_t = getInputSegmentTimes(audio_file, segment_length, overlap_length)
     segments_paths_t = getInputSegments(audio_file, df_timestamps_t, dataPath)
     df_timestamps = df_timestamps.append(df_timestamps_t)
     segments_path.append(segments_paths_t)
     print(f"{audio_file} segmented.\n")
-
+  os.chdir(signals_folder)
   print("Number of segments: {}".format(len(segments_path)))
   print("df_timestamps shape: {}".format(df_timestamps.shape))
-
+  os.chdir(dataPath)
   return segments_path, df_timestamps, p
 
 def processDialogueActs(path2all_xml_files):
@@ -123,7 +125,7 @@ def getInputSegmentTimes(audio_file, segment_length, overlap_length):
 
     return df_timestamps
 
-def getInputSegments(audio_file, df_timestamps, rootPath):
+def getInputSegments(audio_file, df_timestamps, path):
     '''
     input: path to audio_file, df_timestamps['meeting_id','st_time','ed_time']
     output: list of paths to segment file names
@@ -144,7 +146,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       #print("segmented")
       count = count + 1
       
-      segment_path = "{}/segments-1/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      segment_path = "{}/segments-1/{}_{}.wav".format(path, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
     # os.makedirs("./segments_viv") (not working, we created the folder manually)
