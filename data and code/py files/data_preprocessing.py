@@ -182,6 +182,7 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   '''
   get a list melspecs (i.e. a 2D np_array), one melspec per segment
   '''
+<<<<<<< HEAD
   p["melspec: nfft"] = 800
   p["melspec: hop length"] = 400
   p["melspec: win length"] = 800
@@ -192,6 +193,15 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   print("Getting features")
   print("-----------------------------------")
   print("Number of segments: {}".format(len(segment_paths)))
+=======
+  p["nfft"] = 800
+  p["hop_length"] = 400
+  p["win_length"] = 800
+  p["fmax"] = 400
+  p["n_mels"] = 16
+
+  #print("Number of segments: {}".format(len(segments)))
+>>>>>>> Changed the melsepc param., now 16*400 output
   features = []
   result = []
 
@@ -205,6 +215,7 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
     elif idx == (len(segment_paths)-1):
       df_timestamps = df_timestamps[:-1]
     else:
+<<<<<<< HEAD
       melspect = librosa.feature.melspectrogram(signal, sr=p['melspec: sr'], n_fft = p["melspec: nfft"], hop_length = p["melspec: hop length"], win_length = p["melspec: win length"], fmax= p["melspec: fmax"],n_mels = p["melspec: n mels"])
       feat = torch.Tensor(melspect)
       feat = feat.reshape(1, melspect.shape[0],melspect.shape[1])
@@ -221,6 +232,33 @@ def getFeatures(segment_paths, df_timestamps, p, AWS=False):
   print(f"features is a {type(features)} with {len(features)} elements: {features[0].size()}")
 
   return features, df_timestamps, p
+=======
+      melspect = librosa.feature.melspectrogram(signal, sr = sr, n_fft = p["nfft"], hop_length = p["hop_length"], win_length = p["win_length"], fmax = p["fmax"], n_mels = p["n_mels"])
+      #save all np.arrays(.wav) files into an array -> X dataset
+      if features and not melspect.shape == features[0].shape :
+        #print(df_timestamps.loc[[idx]])
+        df_timestamps = df_timestamps.drop([idx])
+      else:
+        features.append(melspect)
+  #print("Finished computing features")
+  #print("length of the features", len(features))
+  shape = features[0].shape
+  for x in features:
+    if not x.shape==shape:
+      print(x.shape)
+  features = np.stack(features)
+  features = torch.Tensor(features)
+  features = features.reshape(features.shape[0], 1, features.shape[1], features.shape[2])
+  #print(features.shape)
+  #print("length of feature list", features.shape[0])
+  #print(features[0][0].shape)
+  #print("length of timestamps", df_timestamps.shape[0])
+  df_timestamps.reset_index(inplace=True)
+  result.append(features)
+  result.append(df_timestamps)
+  result.append(p)
+  return result
+>>>>>>> Changed the melsepc param., now 16*400 output
 
 def dialogueActsXMLtoPd(pathToDialogueActs):
   '''
