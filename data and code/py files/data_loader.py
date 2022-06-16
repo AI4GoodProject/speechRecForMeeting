@@ -87,7 +87,7 @@ def prepareData(pickle_file):
 
     sampler_val = WeightedRandomSampler(samples_weight_val, len(samples_weight_val)) #replacement=False
     print("Validation sampler loaded.\n")
-    print("Parameters: " p)
+    print("Parameters: ", p)
     ## Load Data ##
     p['batch size'] = 64
     train_dataloader = DataLoader(train_data, batch_size=p['batch size'], sampler = sampler)
