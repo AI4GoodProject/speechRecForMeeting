@@ -42,46 +42,14 @@ def prepareDataset(segment_paths, df_timestamps, df_diag_acts):
   labels = getLabels(df_timestamps, df_diag_acts)
   print("Labels size: {}".format(features.size))
 
-  dataset_path = './processed-data/whole-dataset.pkl'
+  data_key = 'whole-dataset.pkl'
+  dataset_path = 's3://ai4good-m6-2022/oricessed-data/{}'.format(data_key)
   data_whole = dataset(features, df_timestamps, labels)
   with open(dataset_path, 'wb') as f:
     print("Writing to {}".format(dataset_path))
     pickle.dump(data_whole, f)
   
-
-  feature_list = features.numpy()
-  un_feature = []
-  un_label = []
-  in_feature = []
-  in_label = []
-  interrupted, uniterrupted, df_timestamps = selectSample(labels, df_timestamps, feature_list)
-  df_timestamps_in = df_timestamps[0]
-  df_timestamps_un = df_timestamps[1]
-  for data in uniterrupted:
-    un_feature.append(data[0])
-    un_label.append(data[1])
-  for data in interrupted:
-    in_feature.append(data[0])
-    in_label.append(data[1])
-  un_feature_tensor = torch.Tensor(un_feature)
-  in_feature_tensor = torch.Tensor(in_feature)
-
-  in_dataset_path = '.processed-data/interrupted-dataset.pkl'
-  un_dataset_path = '.processed-data/uninterrupted-dataset.pkl'
-  with open(dataset_path, 'wb') as f:
-    print("Writing to {}".format(dataset_path))
-    pickle.dump(data, f)
-
-
-  data_in  = dataset(un_feature_tensor, df_timestamps_in, in_label)
-  with open(in_dataset_path, 'wb') as f:
-    print("Writing to {}".format(in_dataset_path))
-    pickle.dump(data_in, f)
-  data_un = dataset(in_feature_tensor,df_timestamps_un, un_label)
-  with open(un_dataset_path, 'wb') as f:
-    print("Writing to {}".format(un_dataset_path))
-    pickle.dump(data_un, f)
-  return dataset_path, in_dataset_path, un_dataset_path
+  return dataset_path
 
 def processSignals(signals_folder, rootPath):
   '''
@@ -89,7 +57,7 @@ def processSignals(signals_folder, rootPath):
   '''
   os.chdir(signals_folder)
   p = {}
-  segment_length, overlap_length = 10, 1 # must be an int
+  segment_length, overlap_length = 10, 5 # must be an int
   p['segment_length'] = segment_length
   p['overlap_length'] = overlap_length
 
@@ -115,7 +83,8 @@ def processDialogueActs(path2all_xml_files):
   df_diag_acts = dialogueActsXMLtoPd(path2all_xml_files) # rootPath + '/dialogue-acts/*.xml'
   df_diag_acts = addDAoIVariable(df_diag_acts)
   df_diag_acts = df_diag_acts[df_diag_acts.DAoI]
-  diag_acts_path = './processed-data/dialogue-acts-prepped.pkl'
+  data_key = 'dialogue-acts-prepped.pkl'
+  diag_acts_path = 's3://ai4good-m6-2022/oricessed-data/{}'.format(data_key)
 
   with open(diag_acts_path, 'wb') as f:
     print("Writing to {}".format(diag_acts_path))
@@ -171,7 +140,7 @@ def getInputSegments(audio_file, df_timestamps, rootPath):
       #print("segmented")
       count = count + 1
       
-      segment_path = "{}/segments-viv/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
+      segment_path = "{}/segments/{}_{}.wav".format(rootPath, df_timestamps['meeting_id'][idx], count)
       absPath = os.path.abspath(segment_path)
       #print("Ready to export to: {}".format(absPath))
     # os.makedirs("./segments_viv") (not working, we created the folder manually)

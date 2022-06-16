@@ -23,7 +23,8 @@ from getpass import getpass
 from pydub import AudioSegment
 import wave, librosa
 
-google = True
+google = False
+AWS = True
 if google:
     from google.colab import drive
     drive.mount('/content/drive')
